@@ -58,6 +58,22 @@ public class Graphe {
         }
     }
     
+    /**
+     * (Résout l'exercice 2.2 du projet)
+     * Une communauté est un ensemble de personnes connectées par leurs 
+     * dettes actuelles ou passées. Cette fonction reçoit en entrée le graphe 
+     * décrivant les dettes actuelles et passées et 
+     * retourne l’ensemble des communautés.
+     * 
+     * @param e Le graphe dont on doit identifier les communautés
+     * @return Une liste reprenant l'ensemble des communautés. 
+     *         Une communauté consiste en une liste de String où chaque 
+     *         String représente le nom du noeud.
+     */
+    public static ArrayList<ArrayList<String>> identifierCommunautes(Graphe e) {
+        return null;
+    }
+    
     
     /**
      * Permet d'afficher le graphe sous forme de chaine de caractères
@@ -67,6 +83,7 @@ public class Graphe {
     @Override
     public String toString() {
         StringBuilder res = new StringBuilder();
+        res.append("Matrice d'adjacence : \n");
         res.append(String.format("%-5s", ""));
         for(int i = 0; i < adjacence.length; i++) {
             res.append(String.format("%-5s", nomsSommets.get(i)));
