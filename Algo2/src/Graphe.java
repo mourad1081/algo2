@@ -1,15 +1,19 @@
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.TreeMap;
 
+/**
+ * Graphe représentant les dettes courantes et passées entre différents amis
+ * @author Mourad, Mounir
+ */
 public class Graphe {
     /** Matrice d'adjacence du graphe **/
     private int[][] adjacence;
     /** Correspondance [Nom du sommet] -> indice dans adjacence **/
-    private TreeMap<String, Integer> nomsSommets;
+    private ArrayList<String> nomsSommets;
     
     /**
      * Construit un graphe vide
@@ -26,12 +30,11 @@ public class Graphe {
      * @throws IOException Si une erreur d'entrée/sortie est survenue
      */
     public Graphe(String path) throws FileNotFoundException, IOException {
-        nomsSommets = new TreeMap<>();
+        nomsSommets = new ArrayList<>();
         if(path != null) {
             int size;
             String ligne;
             String[] dettes;
-            int sommetCourant = 0;
             BufferedReader in = new BufferedReader(new FileReader(path));
             size = Integer.parseInt(in.readLine());
             this.adjacence = new int[size][size];
@@ -43,12 +46,13 @@ public class Graphe {
             // lecture du fichier
             while((ligne = in.readLine()) != null) {
                 dettes = ligne.split(" ");
-                if(! nomsSommets.containsKey(dettes[0]))
-                    nomsSommets.put(dettes[0], sommetCourant++);
-                if (! nomsSommets.containsKey(dettes[1]))
-                    nomsSommets.put(dettes[1], sommetCourant++);
+                if(! nomsSommets.contains(dettes[0]))
+                    nomsSommets.add(dettes[0]);
+                if (! nomsSommets.contains(dettes[1]))
+                    nomsSommets.add(dettes[1]);
                 
-                adjacence[nomsSommets.get(dettes[0])][nomsSommets.get(dettes[1])]
+                adjacence[nomsSommets.indexOf(dettes[0])]
+                         [nomsSommets.indexOf(dettes[1])] 
                         = Integer.parseInt(dettes[2]);
             }
         }
@@ -63,7 +67,9 @@ public class Graphe {
     @Override
     public String toString() {
         StringBuilder res = new StringBuilder();
-        
+        for(int[] ligne : adjacence) {
+            // res.append("%-5s", nomsSommets.)
+        }
         for (int[] ligne : adjacence) {
             for (int c : ligne) {
                 res.append(String.format("%-5s", c));
