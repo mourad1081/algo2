@@ -67,12 +67,15 @@ public class Graphe {
     @Override
     public String toString() {
         StringBuilder res = new StringBuilder();
-        for(int[] ligne : adjacence) {
-            // res.append("%-5s", nomsSommets.)
+        res.append(String.format("%-5s", ""));
+        for(int i = 0; i < adjacence.length; i++) {
+            res.append(String.format("%-5s", nomsSommets.get(i)));
         }
-        for (int[] ligne : adjacence) {
-            for (int c : ligne) {
-                res.append(String.format("%-5s", c));
+        res.append("\n");
+        for (int i = 0; i < adjacence.length; i++) {
+            res.append(String.format("%-5s", nomsSommets.get(i)));
+            for (int j = 0; j < adjacence.length; j++) {
+                res.append(String.format("%-5s", adjacence[i][j]));
             }
             res.append("\n");
         }
