@@ -1,7 +1,6 @@
 *.class
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+Algo2/nbproject/
 
 # Package Files #
 *.jar
