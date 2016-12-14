@@ -88,11 +88,46 @@ public class Graphe {
     }
     
     /**
+     * (Résout l'exercice 2.3 du projet)
+     * Algorithme qui reçoit en entrée le graphe décrivant les dettes actuelles 
+     * et passées, ainsi qu’un nombre K et retourne l’ensemble des hubs sociaux 
+     * tels que leur suppression entraîne la création de 2 communautés d’au 
+     * moins K individus. (cf. fichier PDF)
+     * 
+     * @param g Le graphe dont il faut identifier les hubs sociaux.
+     * @param K Le nombre minimum de noeuds présent dans le hub social.
+     * @return 
+     */
+    public static ArrayList<ArrayList<String>> hubSociaux(Graphe g, int K) {
+        // Idée de l'algorithme : 
+        // -> Sauvegarder le nombre de sous-graphes du graphe.
+        // -> Sauvegarder le nombre de sous-graphes de K individus
+        // -> Pour chaque noeuds : 
+        //    1. Couper tous arcs menant au noeud i
+        //    2. Lancer identifierCommunaautés sur le graphe.
+        //    3. S'il y a plus de sous-graphes que sur le graphe d'origine,
+        //       cela signifie qu'il s'agissait d'une articulation.
+        //    4. On compte la taille des sous-graphes créés. Si c'est >= K et 
+        //       que le nombre de sous-graphes a augmenté, alors c'est cool.
+        //    5. On restaure le noeud dans le graphe
+        for(int i = 0; i < g.sommets.size(); i++) {
+            // Etape 1
+            Integer[] etatArcs = new Integer[g.adjacence.length];
+            for(int j = 0; j < g.adjacence.length; j++) {
+                etatArcs[j] = g.adjacence[j][i];
+                g.adjacence[j][i] = null;
+            }
+            
+            
+        }
+    }
+    
+    /**
      * (Résout l'exercice 2.2 du projet)
      * Une communauté est un ensemble de personnes connectées par leurs 
      * dettes actuelles ou passées. Cette fonction reçoit en entrée le graphe 
      * décrivant les dettes actuelles et passées et 
-     * retourne l’ensemble des communautés.
+     * retourne l’ensemble des communautés. (cf. fichier PDF)
      * 
      * @param g Le graphe dont on doit identifier les communautés
      * @return Une liste reprenant l'ensemble des communautés. 
@@ -202,7 +237,6 @@ public class Graphe {
             }
             res.append("\n");
         }
-
         return res.toString();
     }
 
