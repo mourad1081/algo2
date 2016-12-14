@@ -39,6 +39,11 @@ public class Sommet<T> {
     }
 
     @Override
+    public String toString() {
+        return valeur.toString();
+    }
+
+    @Override
     public boolean equals(Object obj) {
         return (obj instanceof Sommet && this.valeur.equals(((Sommet) obj).valeur));
     }

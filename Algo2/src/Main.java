@@ -3,9 +3,10 @@ import java.util.ArrayList;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        Graphe g = new Graphe("graphe2.txt");
+        Graphe g = new Graphe("graphe1.txt");
         System.out.println(g.toString());
-        
+        Graphe.reduireDetteGraphe(g);
+        System.out.println(g.toString());
         ArrayList<ArrayList<String>> cc = Graphe.identifierCommunautes(g);
         System.out.println("Identification des communautés : ");
         System.out.println("-------------------------------  ");

@@ -3,6 +3,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Graphe représentant les dettes courantes et passées entre différents amis
@@ -23,6 +26,18 @@ public class Graphe {
     /** Correspondance [indiceSommet] -> indice dans la matrice d'adjacence. */
     private ArrayList<Sommet<String>> sommets;
     
+    /** 
+     * Liste utilisée pour sauvegarder les noeud d'un cycle dans le recherche 
+     * recursive 
+     */
+    private ArrayList<Integer> cheminCycle;
+    
+    /**
+     * Map qui sauvegarde et qui trie les cycles trouvés en fonction de leur 
+     * ordre
+     */
+    private TreeMap<Integer, List<List<Integer>>> cycleOrder;
+    
     /**
      * Construit un graphe vide
      *
@@ -41,6 +56,8 @@ public class Graphe {
      */
     public Graphe(String path) throws FileNotFoundException, IOException {
         sommets = new ArrayList<>();
+        cheminCycle = new ArrayList<>();
+        cycleOrder = new TreeMap<>();
         if (path != null) {
             int size;
             String ligne;
@@ -108,7 +125,7 @@ public class Graphe {
     {
         if(!g.estVisite(noeud)) {
             // Marquer le noeud comme visité
-            g.marquerVisite(noeud);
+            g.setSommetVisite(noeud, true);
             // Ajout du noeud courant dans la communauté
             comm.add(g.sommets.get(noeud).getValeur());
             for(int i = 0; i < g.adjacence.length; i++)
@@ -133,8 +150,8 @@ public class Graphe {
      * Marque un noeud comme visité.
      * @param noeud Le noeud à marquer comme visité
      */
-    private void marquerVisite(int noeud) {
-        this.sommets.get(noeud).setVisite(true);
+    private void setSommetVisite(int noeud, boolean etatVisite) {
+        this.sommets.get(noeud).setVisite(etatVisite);
     }
     
     private void resetVisite() {
@@ -149,6 +166,7 @@ public class Graphe {
     private boolean estVisite(int noeud) {
         return this.sommets.get(noeud).isVisite();
     }
+    
     /**
      * Permet d'afficher le graphe sous forme de chaine de caractères (La
      * matrice d'adjacence est affichée)
@@ -188,6 +206,9 @@ public class Graphe {
         return res.toString();
     }
 
+    /**
+     * calcule la matrice d'accessibilité du graphe
+     */
     private void calculerAccessibilite() {
         for (int i = 0; i < adjacence.length; i++) {
             for (int j = 0; j < adjacence[i].length; j++) {
@@ -204,6 +225,96 @@ public class Graphe {
                 }
             }
         }
+    }
+    
+    public static void identifierGrpMaxAmis(){
+        
+    }
+    
+    /**
+     * Recherche et effectue la réduction de dette sur le graphe, cette fonction
+     * est également responsable de démarrer la recherche récurssive de cycle
+     * @param g le graphe sur lequel éffectuer la reduction de dette
+     */
+    public static void reduireDetteGraphe(Graphe g) {
+        for (int i = 0; i < g.sommets.size(); i++) {
+            if (g.accessibilite[i][i]) {
+                g.cheminCycle.add(i);
+                for (int j = 0; j < g.adjacence[i].length; j++) {
+                    if (i != j && g.adjacence[i][j] != null
+                            && g.adjacence[i][j] != 0) {
+                        identifierNoeudsCycles(j, g);
+                    }
+                }
+                g.cheminCycle.remove(new Integer(i));
+            }
+        }
+        for (Map.Entry<Integer, List<List<Integer>>> entry : g.cycleOrder.entrySet()) {
+            for (int j = 0; j < entry.getValue().size(); j++) {
+                reduireDetteCycle(entry.getValue().get(j), g);
+            }
+        }
+        g.cycleOrder.clear();
+    }
+
+    /**
+     * Démarre la recherche des cycles a partir d'un noeud de départ
+     * @param noeudDepart noeud initial de lancement du cycle 
+     * (noeudDepart --> ... --> noeudDepart)
+     * @param g le graphe sur lequel on effectue la recherche 
+     */
+    private static void identifierNoeudsCycles(int noeudDepart, Graphe g) {
+        g.cheminCycle.add(noeudDepart);
+        g.setSommetVisite(noeudDepart, true);
+        if (!g.cheminCycle.isEmpty() && noeudDepart == g.cheminCycle.get(0)) {
+            if (!g.cycleOrder.containsKey(g.cheminCycle.size() - 1)) {
+                g.cycleOrder.put(g.cheminCycle.size() - 1, new ArrayList<>());
+            }
+            g.cycleOrder.get(g.cheminCycle.size() - 1).add(new ArrayList<>(g.cheminCycle));
+        } else {
+            for (int i = 0; i < g.adjacence[noeudDepart].length; i++) {
+                if (noeudDepart != i && !g.sommets.get(i).isVisite()
+                        && g.adjacence[noeudDepart][i] != null
+                        && g.adjacence[noeudDepart][i] != 0) {
+                    identifierNoeudsCycles(i, g);
+                }
+            }
+        }
+        g.setSommetVisite(noeudDepart, false);
+        g.cheminCycle.remove(new Integer(noeudDepart));
+    }
+    
+    /**
+     * Effectue la réduction de dette sur un cycle au niveau de la matrice 
+     * d'adjacence du graphe
+     * @param cheminCycle liste des sommets contenue dans le cycle
+     * @param g le graphe qui contient le cycle
+     */
+    private static void reduireDetteCycle(List<Integer> cheminCycle, Graphe g) {
+        int detteRedTemp, detteReduction = g.adjacence[cheminCycle.get(0)][cheminCycle.get((0 + 1) % cheminCycle.size())];
+        for (int i = 1; i < cheminCycle.size() - 1; i++) {
+            detteRedTemp = g.adjacence[cheminCycle.get(i)][cheminCycle.get((i + 1) % cheminCycle.size())];
+            if (detteRedTemp == 0) {
+                return;
+            }
+            if (detteRedTemp < detteReduction) {
+                detteReduction = detteRedTemp;
+            }
+        }
+        debugCycle(cheminCycle, g);
+        for (int i = 0; i < cheminCycle.size() - 1; i++) {
+            g.adjacence[cheminCycle.get(i)][cheminCycle.get((i + 1) % cheminCycle.size())] -= detteReduction;
+        }
+    }
+
+    private static void debugCycle(List<Integer> cheminCycle, Graphe g) {
+        for (int i = 0; i < cheminCycle.size(); i++) {
+            System.out.print(g.sommets.get(cheminCycle.get(i)));
+            if (i != cheminCycle.size() - 1) {
+                System.out.print(" --> ");
+            }
+        }
+        System.out.println("");
     }
 
 
