@@ -14,10 +14,7 @@ import java.util.TreeMap;
  */
 public class Graphe {
 
-    /**
-     * Matrice d'adjacence du graphe
-     * Chaque cellule contient l'information (dette, visité)
-     */
+    /** Matrice d'adjacence du graphe. */
     private Integer[][] adjacence;
     
     /** Matrice d'accessibilité du graphe. */
@@ -96,30 +93,25 @@ public class Graphe {
      * 
      * @param g Le graphe dont il faut identifier les hubs sociaux.
      * @param K Le nombre minimum de noeuds présent dans le hub social.
+     * @author Mourad
      * @return 
      */
-    public static ArrayList<ArrayList<String>> hubSociaux(Graphe g, int K) {
-        // Idée de l'algorithme : 
-        // -> Sauvegarder le nombre de sous-graphes du graphe.
-        // -> Sauvegarder le nombre de sous-graphes de K individus
-        // -> Pour chaque noeuds : 
-        //    1. Couper tous arcs menant au noeud i
-        //    2. Lancer identifierCommunaautés sur le graphe.
-        //    3. S'il y a plus de sous-graphes que sur le graphe d'origine,
-        //       cela signifie qu'il s'agissait d'une articulation.
-        //    4. On compte la taille des sous-graphes créés. Si c'est >= K et 
-        //       que le nombre de sous-graphes a augmenté, alors c'est cool.
-        //    5. On restaure le noeud dans le graphe
+    public static ArrayList<String> hubSociaux(Graphe g, int K) {
+        ArrayList<String> hubs = new ArrayList<>();
+        Integer[] sauvegardeArcs = new Integer[g.adjacence.length];
+        ArrayList<ArrayList<String>> communautes;
+        communautes = Graphe.identifierCommunautes(g);
+        int nbCommunautes = communautes.size();
+        int nbKIndividus = (int) communautes.stream().filter(s -> s.size() <= K).count();
         for(int i = 0; i < g.sommets.size(); i++) {
-            // Etape 1
-            Integer[] etatArcs = new Integer[g.adjacence.length];
-            for(int j = 0; j < g.adjacence.length; j++) {
-                etatArcs[j] = g.adjacence[j][i];
-                g.adjacence[j][i] = null;
-            }
-            
-            
+            g.setSommetVisite(i, true);
+            communautes = Graphe.identifierCommunautes(g);
+            if((communautes.size() > nbCommunautes) 
+                && (communautes.stream().filter(s -> s.size() >= K)
+                               .count() > nbKIndividus))
+                hubs.add(g.sommets.get(i).getValeur());
         }
+        return hubs;
     }
     
     /**
@@ -133,12 +125,12 @@ public class Graphe {
      * @return Une liste reprenant l'ensemble des communautés. 
      *         Une communauté consiste en une liste de String où chaque 
      *         String représente le nom du noeud.
+     * @author Mourad
      */
     public static ArrayList<ArrayList<String>> identifierCommunautes(Graphe g) {
         ArrayList<ArrayList<String>> communautes = new ArrayList<>();
         ArrayList<String> communaute = new ArrayList<>();
         for(int i = 0; i < g.adjacence.length; i++) {
-            System.out.println(g.sommets.get(i));
             parcours(g, communaute, i);
             if(communaute.size() > 0)
                 communautes.add((ArrayList<String>) communaute.clone());
@@ -155,6 +147,7 @@ public class Graphe {
      * @param comm La communauté actuelle que l'on traite dans le parcours.
      * @param noeud Noeud courant (représenté par un entier sur la matrice
      *              d'adjacence).
+     * @author Mourad
      */
     private static void parcours(Graphe g, ArrayList<String> comm, int noeud)
     {
@@ -190,7 +183,7 @@ public class Graphe {
     }
     
     private void resetVisite() {
-        sommets.stream().forEach( (sommet) -> sommet.setVisite(false) );
+        sommets.stream().forEach((s) -> s.setVisite(false));
     }
     
     /**
@@ -211,19 +204,21 @@ public class Graphe {
     @Override
     public String toString() {
         StringBuilder res = new StringBuilder();
-        res.append("Matrice d'adjacence : \n");
-        res.append(String.format("%-10s", ""));
-        for(int i = 0; i < adjacence.length; i++) {
-            res.append(String.format("%-10s", sommets.get(i).getValeur()));
-        }
-        res.append("\n");
-        for (int i = 0; i < adjacence.length; i++) {
-            res.append(String.format("%-10s", sommets.get(i).getValeur()));
-            for (int j = 0; j < adjacence.length; j++) {
-                res.append(String.format("%-10s", adjacence[i][j]));
-            }
-            res.append("\n");
-        }
+        for(int i = 0; i < adjacence.length; i++)
+            for(int j = 0; j < adjacence.length; j++)
+                if(adjacence[i][j] != null)
+                    res.append(sommets.get(i)).append(" ")
+                       .append(sommets.get(j)).append(" ")
+                       .append(adjacence[i][j]).append("\n");
+        return res.toString();
+    }
+
+    /**
+     * Méthode permettant d'afficher la matrice d'accessibilité du graphe sur
+     * la sortie standard.
+     */
+    public void afficherAccessibilite() {
+        StringBuilder res = new StringBuilder();
         res.append("Matrice d'accessibilité : \n");
         res.append(String.format("%-10s", ""));
         for(int i = 0; i < adjacence.length; i++) {
@@ -237,9 +232,32 @@ public class Graphe {
             }
             res.append("\n");
         }
-        return res.toString();
+        System.out.println(res.toString());
     }
-
+    
+    /**
+     * Méthode permettant d'afficher la matrice d'adjacence du graphe sur
+     * la sortie standard.
+     */
+    public void afficherAdjacence() {
+        StringBuilder res = new StringBuilder();
+        res.append("Matrice d'adjacence : \n");
+        res.append(String.format("%-10s", ""));
+        for(int i = 0; i < adjacence.length; i++) {
+            res.append(String.format("%-10s", sommets.get(i).getValeur()));
+        }
+        res.append("\n");
+        for (int i = 0; i < adjacence.length; i++) {
+            res.append(String.format("%-10s", sommets.get(i).getValeur()));
+            for (int j = 0; j < adjacence.length; j++) {
+                res.append(String.format("%-10s", adjacence[i][j]));
+            }
+            res.append("\n");
+        }
+        
+        System.out.println(res.toString());
+    }
+    
     /**
      * calcule la matrice d'accessibilité du graphe
      */
@@ -350,6 +368,4 @@ public class Graphe {
         }
         System.out.println("");
     }
-
-
 }
