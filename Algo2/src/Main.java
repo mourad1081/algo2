@@ -31,5 +31,10 @@ public class Main {
         System.out.println("Identification hubs sociaux (min. 3 individus) :");
         System.out.println("----------------------------------------------- ");
         System.out.println("Hubs : " + Graphe.hubSociaux(g, 3) + "\n");
+        System.out.println("Identification d'un des plus grands groupes "
+                + "d'amis :");
+        System.out.println("------------------------------------------- ");
+        System.out.println(Graphe.identifierGrpMaxAmis(g));
+        
     }
 }
