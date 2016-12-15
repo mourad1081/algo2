@@ -136,10 +136,10 @@ public class Graphe {
     
     /**
      * @param g graphe ou se trouve la liste des noeuds composants le plus 
-     * grande groupe d'amis
+     * grande groupe d'amis.
      * 
      * @return le string contenant le ou l'un des plus grands groupes d'amis du
-     * graphe
+     * graphe.
      * @author Mounir
      */
     private String afficherMaxGrpAmis(){
@@ -156,7 +156,7 @@ public class Graphe {
     }
     
     /**
-     * calcule la matrice d'accessibilité du graphe
+     * Génère la matrice d'accessibilité du graphe (Algorithme de Roy-Warshall).
      */
     private void calculerAccessibilite() {
         for (int i = 0; i < adjacence.length; i++) {
@@ -218,7 +218,6 @@ public class Graphe {
     
     /**
      * Marque un noeud comme visité.
-     * 
      * @param noeud Le noeud à marquer comme visité
      */
     private void setSommetVisite(int noeud, boolean etatVisite) {
@@ -226,10 +225,10 @@ public class Graphe {
     }
     
     /**
-     * Reinitialise l'état de la visite du noeud pour un futur parcours
+     * Reinitialise l'état de la visite du noeud pour un futur parcours.
      */
     private void resetVisite() {
-        sommets.stream().forEach((s) -> s.setVisite(false));
+        this.sommets.stream().forEach((s) -> s.setVisite(false));
     }
     
     /**
@@ -243,10 +242,8 @@ public class Graphe {
     }
     
     /**
-     * Permet d'afficher le graphe sous forme de chaine de caractères (La
-     * matrice d'adjacence est affichée)
-     *
-     * @return Graphe sous forme de chaine de caractères
+     * Permet d'afficher le graphe dans le même format que le fichier d'entrée.
+     * @return Le graphe sous la même forme que le fichier d'entrée.
      */
     @Override
     public String toString() {
@@ -384,12 +381,9 @@ public class Graphe {
     private static void parcours(Graphe g, ArrayList<String> comm, int noeud)
     {
         if(!g.estVisite(noeud)) {
-            // Marquer le noeud comme visité
             g.setSommetVisite(noeud, true);
-            // Ajout du noeud courant dans la communauté
             comm.add(g.sommets.get(noeud).getValeur());
             for(int i = 0; i < g.adjacence.length; i++)
-                // Pour chaque destination, s'il n'a pas déjà été visité
                 if(g.destinationExiste(noeud, i))
                     parcours(g, comm, i);
         }
@@ -409,18 +403,22 @@ public class Graphe {
      */
     public static ArrayList<String> hubSociaux(Graphe g, int K) {
         ArrayList<String> hubs = new ArrayList<>();
-        Integer[] sauvegardeArcs = new Integer[g.adjacence.length];
         ArrayList<ArrayList<String>> communautes;
         communautes = Graphe.identifierCommunautes(g);
         int nbCommunautes = communautes.size();
-        int nbKIndividus = (int) communautes.stream().filter(s -> s.size() <= K).count();
+        int nbKIndividus = (int) communautes.stream()
+                                            .filter(s -> s.size() >= K)
+                                            .count();
         for(int i = 0; i < g.sommets.size(); i++) {
             g.setSommetVisite(i, true);
             communautes = Graphe.identifierCommunautes(g);
-            if((communautes.size() > nbCommunautes) 
-                && (communautes.stream().filter(s -> s.size() >= K)
-                               .count() > nbKIndividus))
+            if((communautes.size() > nbCommunautes)
+                && (communautes.stream()
+                               .filter(s -> s.size() >= K)
+                               .count() == (nbKIndividus+1)))
+            {
                 hubs.add(g.sommets.get(i).getValeur());
+            }
         }
         return hubs;
     }
