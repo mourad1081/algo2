@@ -347,7 +347,7 @@ public class Graphe {
      * Une communauté est un ensemble de personnes connectées par leurs 
      * dettes actuelles ou passées. Cette fonction reçoit en entrée le graphe 
      * décrivant les dettes actuelles et passées et 
-     * retourne l’ensemble des communautés. (cf. fichier PDF)
+     * retourne l’ensemble des communautés. (cf. fichier PDF du projet)
      * 
      * @param g Le graphe dont on doit identifier les communautés
      * @return Une liste reprenant l'ensemble des communautés. 
@@ -415,7 +415,7 @@ public class Graphe {
             if((communautes.size() > nbCommunautes)
                 && (communautes.stream()
                                .filter(s -> s.size() >= K)
-                               .count() == (nbKIndividus+1)))
+                               .count() > nbKIndividus))
             {
                 hubs.add(g.sommets.get(i).getValeur());
             }
