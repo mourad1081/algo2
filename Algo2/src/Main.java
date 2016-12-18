@@ -34,7 +34,7 @@ public class Main {
             
             // Identification des hubs sociaux
             System.out.println("+-----------------------------------+");
-            System.out.println("| Identification des hubs sociaux   |");
+            System.out.println("|  Identification des hubs sociaux  |");
             System.out.println("+===================================+");
             System.out.println("|   K   |            Hubs           |");
             System.out.println("+-------+---------------------------+");
@@ -44,9 +44,11 @@ public class Main {
             System.out.println("+-----------------------------------+");
             System.out.println("");
             
-            System.out.println("Identification d'un des plus grands groupes "
-                    + "d'amis :");
-            System.out.println("---------------------------------------------------");
+            // Plus grand groupe d'amis
+            System.out.println("+-----------------------------------+");
+            System.out.println("|  Identification d'un des plus     | \n"
+                             + "|      grands groupes d'amis        |");
+            System.out.println("+===================================+");
             System.out.println(Graphe.identifierGrpMaxAmis(g));
         } catch(IOException e) {
             System.err.println("Erreur : Veuillez spécifier un fichier correct.");
