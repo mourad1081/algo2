@@ -76,8 +76,8 @@ public class Graphe {
             // lecture du fichier
             while ((ligne = in.readLine()) != null) {
                 dettes = ligne.split(" ");
-                Sommet  s = new Sommet<>(dettes[0], false);
-                Sommet ss = new Sommet<>(dettes[1], false);
+                Sommet<String>  s = new Sommet<>(dettes[0], false);
+                Sommet<String> ss = new Sommet<>(dettes[1], false);
                 if (!sommets.contains( s)) sommets.add( s);
                 if (!sommets.contains(ss)) sommets.add(ss);
                 
@@ -205,7 +205,7 @@ public class Graphe {
     }
     
     /**
-     * Indique si il existe une arrete entre noeud départ et arrivée
+     * Indique s'il existe une arrete entre noeud départ et arrivée
      * 
      * @param depart Le noeud de départ
      * @param arrivee Le noeud d'arrivée
@@ -361,7 +361,7 @@ public class Graphe {
         for(int i = 0; i < g.adjacence.length; i++) {
             parcours(g, communaute, i);
             if(communaute.size() > 0)
-                communautes.add((ArrayList<String>) communaute.clone());
+                communautes.add(new ArrayList<>(communaute));
             communaute.clear();
         }
         
@@ -399,7 +399,9 @@ public class Graphe {
      * @param g Le graphe dont il faut identifier les hubs sociaux.
      * @param K Le nombre minimum de noeuds présent dans le hub social.
      * @author Mourad
-     * @return 
+     * @return La liste des hubs sociaux. Un hub social n'est qu'un String 
+     *         représentant le nom du noeud. 
+     *         Donc, en soi, on retourne une liste de String en soi.
      */
     public static ArrayList<String> hubSociaux(Graphe g, int K) {
         ArrayList<String> hubs = new ArrayList<>();
@@ -469,12 +471,12 @@ public class Graphe {
         ArrayList<Integer> xTemp;
         ArrayList<Integer> pTemp;
         if (p.isEmpty() && x.isEmpty() && r.size() > g.maxGroupAmis.size()) {
-            g.maxGroupAmis = (ArrayList<Integer>) r.clone();
+            g.maxGroupAmis = new ArrayList<Integer>(r);
         }
         for (int i = 0; i < p.size(); i++) {
             r.add(p.get(i));
-            pTemp = (ArrayList<Integer>) p.clone();
-            xTemp = (ArrayList<Integer>) x.clone();
+            pTemp = new ArrayList<>(p);
+            xTemp = new ArrayList<>(x);
             pTemp.removeAll(noeudNonVoisin.get(p.get(i)));
             xTemp.removeAll(noeudNonVoisin.get(p.get(i)));
             GrpMaxAmisRecurssif(r, pTemp, xTemp, noeudNonVoisin, g);
@@ -483,5 +485,4 @@ public class Graphe {
             p.remove(p.get(i));
         }
     }
-    
 }
