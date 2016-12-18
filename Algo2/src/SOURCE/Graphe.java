@@ -23,21 +23,7 @@ public class Graphe {
     /** Correspondance [indiceSommet] -> indice dans la matrice d'adjacence. */
     private ArrayList<Sommet<String>> sommets;
     
-    /** 
-     * Liste utilisée pour sauvegarder les noeud d'un cycle dans le recherche 
-     * recursive 
-     */
-    private ArrayList<Integer> cheminCycle;
-    
-    /**
-     * Map qui sauvegarde et qui trie les cycles trouvés en fonction de leur 
-     * ordre
-     */
-    private TreeMap<Integer, List<List<Integer>>> cycleOrder;
-    
-    /**
-     * Plus grand sous graphe complet du graphe
-     */
+    /** Plus grand sous graphe complet du graphe */
     private ArrayList<Integer> maxGroupAmis;
     
     /**
@@ -58,8 +44,6 @@ public class Graphe {
      */
     public Graphe(String path) throws FileNotFoundException, IOException {
         sommets = new ArrayList<>();
-        cheminCycle = new ArrayList<>();
-        cycleOrder = new TreeMap<>();
         if (path != null) {
             int size;
             String ligne;
@@ -270,24 +254,26 @@ public class Graphe {
      * @author Mounir
      */
     public static void reduireDetteGraphe(Graphe g) {
+        ArrayList<Integer> cheminCycle = new ArrayList<>();
+        TreeMap<Integer, List<List<Integer>>> cycleOrder = new TreeMap<>();
         for (int i = 0; i < g.sommets.size(); i++) {
             if (g.accessibilite[i][i]) {
-                g.cheminCycle.add(i);
+                cheminCycle.add(i);
                 for (int j = 0; j < g.adjacence[i].length; j++) {
                     if (i != j && g.adjacence[i][j] != null
                             && g.adjacence[i][j] != 0) {
-                        identifierNoeudsCycles(j, g);
+                        identifierNoeudsCycles(j, cheminCycle, cycleOrder, g);
                     }
                 }
-                g.cheminCycle.remove(new Integer(i));
+                cheminCycle.remove(new Integer(i));
             }
         }
-        for (Map.Entry<Integer, List<List<Integer>>> entry : g.cycleOrder.entrySet()) {
+        for (Map.Entry<Integer, List<List<Integer>>> entry : cycleOrder.entrySet()) {
             for (int j = 0; j < entry.getValue().size(); j++) {
                 reduireDetteCycle(entry.getValue().get(j), g);
             }
         }
-        g.cycleOrder.clear();
+        cycleOrder.clear();
     }
 
     /**
@@ -298,25 +284,28 @@ public class Graphe {
      * @param g le graphe sur lequel on effectue la recherche 
      * @author Mounir
      */
-    private static void identifierNoeudsCycles(int noeudDepart, Graphe g) {
-        g.cheminCycle.add(noeudDepart);
+    private static void identifierNoeudsCycles(int noeudDepart, 
+            ArrayList<Integer> cheminCycle, 
+            TreeMap<Integer, List<List<Integer>>> cycleOrder, 
+            Graphe g) {
+        cheminCycle.add(noeudDepart);
         g.setSommetVisite(noeudDepart, true);
-        if (!g.cheminCycle.isEmpty() && noeudDepart == g.cheminCycle.get(0)) {
-            if (!g.cycleOrder.containsKey(g.cheminCycle.size() - 1)) {
-                g.cycleOrder.put(g.cheminCycle.size() - 1, new ArrayList<>());
+        if (!cheminCycle.isEmpty() && noeudDepart == cheminCycle.get(0)) {
+            if (!cycleOrder.containsKey(cheminCycle.size() - 1)) {
+                cycleOrder.put(cheminCycle.size() - 1, new ArrayList<>());
             }
-            g.cycleOrder.get(g.cheminCycle.size() - 1).add(new ArrayList<>(g.cheminCycle));
+            cycleOrder.get(cheminCycle.size() - 1).add(new ArrayList<>(cheminCycle));
         } else {
             for (int i = 0; i < g.adjacence[noeudDepart].length; i++) {
                 if (noeudDepart != i && !g.sommets.get(i).isVisite()
                         && g.adjacence[noeudDepart][i] != null
                         && g.adjacence[noeudDepart][i] != 0) {
-                    identifierNoeudsCycles(i, g);
+                    identifierNoeudsCycles(i, cheminCycle, cycleOrder, g);
                 }
             }
         }
         g.setSommetVisite(noeudDepart, false);
-        g.cheminCycle.remove(new Integer(noeudDepart));
+        cheminCycle.remove(new Integer(noeudDepart));
     }
     
     /**
@@ -471,7 +460,7 @@ public class Graphe {
         ArrayList<Integer> xTemp;
         ArrayList<Integer> pTemp;
         if (p.isEmpty() && x.isEmpty() && r.size() > g.maxGroupAmis.size()) {
-            g.maxGroupAmis = new ArrayList<Integer>(r);
+            g.maxGroupAmis = new ArrayList<>(r);
         }
         for (int i = 0; i < p.size(); i++) {
             r.add(p.get(i));
