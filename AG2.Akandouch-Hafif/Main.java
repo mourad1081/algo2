@@ -5,9 +5,18 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         String fichier = "";
-        if(args.length > 0)
-            fichier = args[0];
-        else {
+		int K = 0;
+		if(args.length == 0){
+				System.out.println("Le programme necessite un parametre au minimum");
+		        return;
+		}
+		if(args.length == 1){
+			try{
+	    		K = Integer.parseInt(args[0]);
+			}catch(Exception e){
+				System.out.println("Le lancement avec 1 argument necessite un Entier uniquement");
+				return;
+			}
             int numberTest = lireNumeroTest();
             switch (numberTest) {
                 case 0:
@@ -20,6 +29,10 @@ public class Main {
                     fichier = "grapheTest/grapheProjet.txt";
                     break;
             }
+        }
+        if(args.length == 2){
+            fichier = args[0];
+	    	K = Integer.parseInt(args[1]);
         }
         try  {
             Graphe g = new Graphe(fichier);
@@ -49,9 +62,8 @@ public class Main {
             System.out.println("+===================================+");
             System.out.println("|   K   |            Hubs           |");
             System.out.println("+-------+---------------------------+");
-            for(int i = 1; i <= 5; i++)
-                System.out.format("%-2s%5d%-3s%25s%-2s%n", "|", i, " | ",
-                                  Graphe.hubSociaux(g, i), " |" );
+                System.out.format("%-2s%5d%-3s%25s%-2s%n", "|", K, " | ",
+                                  Graphe.hubSociaux(g, K), " |" );
             System.out.println("+-----------------------------------+");
             System.out.println("");
 
@@ -74,7 +86,7 @@ public class Main {
         Scanner kb = new Scanner(System.in);
         System.out.println("---------------------------------------------------"
                           +"---------------------------------");
-        System.out.println("Voici nos fichiers tests que vous pouvez éxecuter :");
+        System.out.println("Voici nos fichiers tests que vous pouvez executer :");
         System.out.println(filesNumber);
         while(numTest < 0 || numTest > 6){
             System.out.print(askNumber);
